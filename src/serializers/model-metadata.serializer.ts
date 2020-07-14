@@ -32,7 +32,7 @@ export class ModelMetadataSerializer<T> implements Serializer<T> {
   }
 
   private setValueToModel(model: { [key: string]: any }, metadata: FieldMetadata, jsonValue?: any, additionalInfo?: any): void {
-    if (isPresent(jsonValue)) {
+    if (jsonValue !== undefined) {
       model[metadata.modelPropertyName] = metadata.serializer.deserialize(jsonValue, additionalInfo);
     }
   }
@@ -42,7 +42,7 @@ export class ModelMetadataSerializer<T> implements Serializer<T> {
 
     return fields.reduce((dict: { [key: string]: any }, metadata: FieldMetadata) => {
       const modelValue = (model as { [key: string]: any })[metadata.modelPropertyName];
-      if (isPresent(modelValue)) {
+      if (modelValue !== undefined) {
         const address = parseJsonPropertyName(metadata.jsonPropertyName);
         setPropertyToJson(dict, address, metadata.serializer.serialize(modelValue, additionalInfo));
       }
