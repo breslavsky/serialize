@@ -4,7 +4,6 @@ import { getMetadata } from '../metadata/get-metadata';
 import { NoFieldsError } from '../errors';
 import { getPropertyOfJson, parseJsonPropertyName, setPropertyToJson } from '../converters/json-utils';
 import { FieldMetadata } from '../field/field.metadata';
-import { isPresent } from './field.utils';
 
 export class ModelMetadataSerializer<T> implements Serializer<T> {
   constructor(private modelConstructor: Constructor<T>) {}
@@ -33,7 +32,7 @@ export class ModelMetadataSerializer<T> implements Serializer<T> {
 
   private setValueToModel(model: { [key: string]: any }, metadata: FieldMetadata, jsonValue?: any, additionalInfo?: any): void {
     if (jsonValue !== undefined) {
-      model[metadata.modelPropertyName] = metadata.serializer.deserialize(jsonValue, additionalInfo);
+      model[metadata.modelPropertyName] = !!jsonValue ? metadata.serializer.deserialize(jsonValue, additionalInfo) : null;
     }
   }
 
@@ -44,7 +43,7 @@ export class ModelMetadataSerializer<T> implements Serializer<T> {
       const modelValue = (model as { [key: string]: any })[metadata.modelPropertyName];
       if (modelValue !== undefined) {
         const address = parseJsonPropertyName(metadata.jsonPropertyName);
-        setPropertyToJson(dict, address, metadata.serializer.serialize(modelValue, additionalInfo));
+        setPropertyToJson(dict, address, !!modelValue ? metadata.serializer.serialize(modelValue, additionalInfo) : null);
       }
       return dict;
     }, {});
